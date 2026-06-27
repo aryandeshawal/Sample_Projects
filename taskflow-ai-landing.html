@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskFlow AI — Think Less. Ship More.</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ─── TOKENS ─────────────────────────────────────────── */
+  :root {
+    --void:      #09090B;
+    --surface:   #111116;
+    --card:      rgba(255,255,255,0.04);
+    --border:    rgba(255,255,255,0.08);
+    --violet:    #6C3BFF;
+    --violet-mid:#A855F7;
+    --lavender:  #F0ABFC;
+    --white:     #FFFFFF;
+    --muted:     rgba(255,255,255,0.45);
+    --green:     #22D3A5;
+  }
+
+  /* ─── RESET ──────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── TYPOGRAPHY ─────────────────────────────────────── */
+  .display { font-family: 'Sora', sans-serif; }
+  h1 { font-family:'Sora',sans-serif; font-weight:800; font-size:clamp(2.6rem,6vw,5rem); line-height:1.08; letter-spacing:-0.03em; }
+  h2 { font-family:'Sora',sans-serif; font-weight:700; font-size:clamp(1.9rem,4vw,3rem); line-height:1.15; letter-spacing:-0.025em; }
+  h3 { font-family:'Sora',sans-serif; font-weight:600; font-size:1.2rem; }
+  p  { color: var(--muted); line-height: 1.75; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--violet-mid), var(--lavender));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── LAYOUT ─────────────────────────────────────────── */
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { position: relative; overflow: hidden; }
+
+  /* ─── GLOW UTILITIES ─────────────────────────────────── */
+  .glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  /* ─── BUTTONS ────────────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--violet), var(--violet-mid));
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-weight: 600; font-size: 0.95rem;
+    padding: 14px 28px;
+    border-radius: 12px; border: none; cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 32px rgba(108,59,255,0.45);
+    position: relative; z-index: 1;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 56px rgba(108,59,255,0.65);
+  }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; font-size: 0.9rem;
+    padding: 14px 22px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer; text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-ghost:hover { background: var(--card); border-color: rgba(255,255,255,0.18); }
+
+  /* ─── PILL / BADGE ───────────────────────────────────── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,59,255,0.15);
+    border: 1px solid rgba(108,59,255,0.35);
+    color: var(--lavender);
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .pill-dot { width:6px; height:6px; border-radius:50%; background:var(--lavender); animation: pulse-dot 1.8s infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+
+  /* ─── NAV ─────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 18px 0;
+    background: rgba(9,9,11,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+  .nav-inner { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+  .logo { font-family:'Sora',sans-serif; font-weight:800; font-size:1.15rem; text-decoration:none; color:var(--white); display:flex; align-items:center; gap:8px; }
+  .logo-icon { width:30px; height:30px; background:linear-gradient(135deg,var(--violet),var(--violet-mid)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .nav-links { display:flex; align-items:center; gap:28px; }
+  .nav-links a { color:var(--muted); text-decoration:none; font-size:0.875rem; font-weight:500; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--white); }
+  .nav-cta { display:flex; align-items:center; gap:12px; }
+
+  /* ─── HERO ───────────────────────────────────────────── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 0 80px;
+    background: var(--void);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+  }
+  .hero-copy { position:relative; z-index:2; }
+  .hero-copy h1 { margin: 20px 0 24px; }
+  .hero-copy p { font-size:1.1rem; max-width:480px; margin-bottom:36px; }
+  .hero-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .hero-trust { margin-top:52px; display:flex; align-items:center; gap:16px; }
+  .avatars { display:flex; }
+  .avatar { width:32px; height:32px; border-radius:50%; border:2px solid var(--void); margin-left:-8px; background:linear-gradient(135deg,#6C3BFF,#A855F7); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+  .avatar:first-child { margin-left:0; }
+  .hero-trust-text { font-size:0.8rem; color:var(--muted); }
+  .hero-trust-text strong { color:var(--white); }
+  .stars { color:#FBBF24; font-size:0.85rem; }
+
+  /* Neural Mesh Canvas */
+  #neural-canvas {
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; opacity:0.6;
+  }
+
+  /* Hero Visual (right side) */
+  .hero-visual { position:relative; z-index:2; }
+  .app-mockup {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .app-mockup::before {
+    content:'';
+    position:absolute; inset:-1px; border-radius:21px;
+    background: linear-gradient(135deg, rgba(108,59,255,0.4) 0%, transparent 50%, rgba(168,85,247,0.2) 100%);
+    z-index:-1;
+  }
+  .mockup-bar { display:flex; gap:6px; margin-bottom:16px; align-items:center; }
+  .mockup-dot { width:10px; height:10px; border-radius:50%; }
+  .mockup-bar-title { font-size:0.75rem; color:var(--muted); margin-left:8px; font-family:'Sora',sans-serif; }
+  .task-row {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px;
+    background:rgba(255,255,255,0.04);
+    border-radius:10px; margin-bottom:8px;
+    border:1px solid rgba(255,255,255,0.05);
+    transition:background 0.2s;
+  }
+  .task-check { width:18px; height:18px; border-radius:5px; flex-shrink:0; }
+  .task-label { font-size:0.82rem; flex:1; font-family:'Inter',sans-serif; }
+  .task-badge { font-size:0.68rem; padding:3px 8px; border-radius:999px; font-weight:600; white-space:nowrap; }
+  .ai-insight-card {
+    margin-top:12px;
+    background:linear-gradient(135deg,rgba(108,59,255,0.15),rgba(168,85,247,0.08));
+    border:1px solid rgba(108,59,255,0.3);
+    border-radius:12px; padding:12px 14px;
+    display:flex; gap:10px; align-items:flex-start;
+  }
+  .ai-icon { font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+  .ai-label { font-size:0.7rem; color:var(--lavender); font-weight:600; letter-spacing:0.06em; margin-bottom:2px; }
+  .ai-text { font-size:0.8rem; color:rgba(255,255,255,0.75); line-height:1.5; }
+
+  /* Floating stat chips */
+  .stat-chip {
+    position:absolute;
+    background:rgba(17,17,22,0.9);
+    border:1px solid rgba(255,255,255,0.1);
+    backdrop-filter:blur(12px);
+    border-radius:12px; padding:10px 14px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  }
+  .stat-chip .num { font-family:'Sora',sans-serif; font-size:1.25rem; font-weight:700; }
+  .stat-chip .lbl { font-size:0.7rem; color:var(--muted); }
+  .chip-1 { top:-20px; right:-24px; }
+  .chip-2 { bottom:20px; left:-28px; }
+
+  /* ─── LOGOS STRIP ─────────────────────────────────────── */
+  #logos { padding:56px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .logos-label { text-align:center; font-size:0.78rem; letter-spacing:0.1em; color:var(--muted); text-transform:uppercase; margin-bottom:32px; }
+  .logos-track { display:flex; justify-content:center; align-items:center; gap:48px; flex-wrap:wrap; }
+  .logo-mark { font-family:'Sora',sans-serif; font-size:1rem; font-weight:700; color:rgba(255,255,255,0.25); letter-spacing:-0.02em; transition:color 0.2s; }
+  .logo-mark:hover { color:rgba(255,255,255,0.55); }
+
+  /* ─── PROBLEM / INSIGHT ───────────────────────────────── */
+  #problem { padding:120px 0; }
+  .problem-inner { display:grid; grid-template-columns:1fr 1.2fr; gap:80px; align-items:center; }
+  .problem-stat { font-family:'Sora',sans-serif; font-size:clamp(4rem,10vw,7rem); font-weight:800; line-height:1; letter-spacing:-0.04em; }
+  .problem-stat-label { font-size:1rem; color:var(--muted); margin-top:8px; max-width:280px; }
+  .problem-copy h2 { margin-bottom:20px; }
+  .problem-copy p { margin-bottom:24px; }
+  .callout-bar {
+    background:linear-gradient(135deg,rgba(108,59,255,0.12),rgba(168,85,247,0.06));
+    border-left:3px solid var(--violet);
+    border-radius:0 12px 12px 0;
+    padding:16px 20px;
+    font-size:0.95rem;
+    color:rgba(255,255,255,0.8);
+    font-style:italic;
+    margin-top:24px;
+  }
+
+  /* ─── FEATURES ────────────────────────────────────────── */
+  #features { padding:120px 0; background: linear-gradient(180deg, var(--void) 0%, #0D0D1A 100%); }
+  .section-header { text-align:center; max-width:620px; margin:0 auto 72px; }
+  .section-header .pill { margin-bottom:20px; }
+  .section-header h2 { margin-bottom:16px; }
+  .section-header p { font-size:1.05rem; }
+  .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .feature-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:32px 28px;
+    position:relative; overflow:hidden;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+  }
+  .feature-card:hover {
+    transform:translateY(-6px);
+    border-color:rgba(108,59,255,0.4);
+    box-shadow:0 20px 60px rgba(108,59,255,0.12);
+  }
+  .feature-card.featured {
+    background:linear-gradient(135deg,rgba(108,59,255,0.18),rgba(168,85,247,0.08));
+    border-color:rgba(108,59,255,0.35);
+    grid-row:span 2;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .feature-card::after {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(168,85,247,0.5), transparent);
+    opacity:0; transition:opacity 0.3s;
+  }
+  .feature-card:hover::after { opacity:1; }
+  .feat-icon { font-size:1.6rem; margin-bottom:20px; display:block; }
+  .feat-title { margin-bottom:12px; }
+  .feat-desc { font-size:0.88rem; line-height:1.7; }
+  .feat-visual {
+    margin-top:28px;
+    background:rgba(0,0,0,0.3);
+    border-radius:12px; padding:16px;
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  .progress-row { margin-bottom:10px; }
+  .progress-label { display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted); margin-bottom:5px; }
+  .progress-track { height:5px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--violet),var(--violet-mid)); }
+
+  /* ─── HOW IT WORKS ────────────────────────────────────── */
+  #how { padding:120px 0; }
+  .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; margin-top:72px; }
+  .steps-grid::before {
+    content:'';
+    position:absolute; top:36px; left:calc(100%/6); right:calc(100%/6); height:1px;
+    background:linear-gradient(90deg, var(--violet), var(--violet-mid));
+    opacity:0.3;
+  }
+  .step { text-align:center; padding:0 32px; }
+  .step-num {
+    width:72px; height:72px; border-radius:50%;
+    background:linear-gradient(135deg,rgba(108,59,255,0.25),rgba(168,85,247,0.1));
+    border:1px solid rgba(108,59,255,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Sora',sans-serif; font-size:1.3rem; font-weight:800;
+    margin:0 auto 24px;
+    position:relative; z-index:1;
+    color:var(--lavender);
+  }
+  .step h3 { margin-bottom:12px; }
+  .step p { font-size:0.88rem; }
+
+  /* ─── SOCIAL PROOF / TESTIMONIALS ────────────────────── */
+  #proof { padding:120px 0; background:linear-gradient(180deg,#0D0D1A 0%,var(--void) 100%); }
+  .metrics-row { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:80px; }
+  .metric-card {
+    text-align:center;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:28px 20px;
+    position:relative; overflow:hidden;
+  }
+  .metric-card::before {
+    content:'';
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    width:60%; height:2px;
+    background:linear-gradient(90deg,transparent,var(--violet-mid),transparent);
+  }
+  .metric-num { font-family:'Sora',sans-serif; font-size:2.4rem; font-weight:800; margin-bottom:6px; }
+  .metric-label { font-size:0.8rem; color:var(--muted); }
+
+  .testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .testi-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:20px; padding:28px;
+    transition:border-color 0.3s, transform 0.3s;
+  }
+  .testi-card:hover { border-color:rgba(168,85,247,0.3); transform:translateY(-4px); }
+  .testi-card.featured-testi {
+    background:linear-gradient(135deg,rgba(108,59,255,0.12),rgba(168,85,247,0.06));
+    border-color:rgba(108,59,255,0.3);
+    grid-column:span 1;
+  }
+  .testi-stars { color:#FBBF24; margin-bottom:16px; font-size:0.9rem; }
+  .testi-quote { font-size:0.92rem; color:rgba(255,255,255,0.82); line-height:1.7; margin-bottom:20px; font-style:italic; }
+  .testi-author { display:flex; align-items:center; gap:10px; }
+  .testi-avatar {
+    width:38px; height:38px; border-radius:50%;
+    background:linear-gradient(135deg,var(--violet),var(--violet-mid));
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.8rem; font-weight:700; flex-shrink:0;
+  }
+  .testi-name { font-size:0.85rem; font-weight:600; }
+  .testi-role { font-size:0.75rem; color:var(--muted); }
+
+  /* ─── PRICING ─────────────────────────────────────────── */
+  #pricing { padding:120px 0; }
+  .pricing-toggle { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:56px; font-size:0.875rem; }
+  .toggle-track {
+    width:44px; height:24px; border-radius:99px;
+    background:linear-gradient(135deg,var(--violet),var(--violet-mid));
+    position:relative; cursor:pointer;
+  }
+  .toggle-thumb { width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; right:3px; transition:right 0.2s; }
+  .save-badge { background:rgba(34,211,165,0.15); border:1px solid rgba(34,211,165,0.3); color:var(--green); font-size:0.72rem; font-weight:600; padding:3px 8px; border-radius:999px; }
+  .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; max-width:960px; margin:0 auto; }
+  .price-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:24px; padding:36px 30px;
+    position:relative; overflow:hidden;
+  }
+  .price-card.popular {
+    background:linear-gradient(160deg,rgba(108,59,255,0.2),rgba(168,85,247,0.08));
+    border-color:rgba(108,59,255,0.5);
+    box-shadow:0 0 80px rgba(108,59,255,0.15);
+  }
+  .popular-badge {
+    position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+    background:linear-gradient(135deg,var(--violet),var(--violet-mid));
+    font-size:0.72rem; font-weight:700; letter-spacing:0.06em;
+    padding:5px 16px; border-radius:0 0 12px 12px;
+    font-family:'Sora',sans-serif;
+    white-space:nowrap;
+  }
+  .price-tier { font-family:'Sora',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .price-amount { font-family:'Sora',sans-serif; font-size:2.8rem; font-weight:800; line-height:1; margin-bottom:4px; }
+  .price-amount span { font-size:1rem; font-weight:400; color:var(--muted); vertical-align:super; font-family:'Inter',sans-serif; }
+  .price-period { font-size:0.8rem; color:var(--muted); margin-bottom:24px; }
+  .price-desc { font-size:0.85rem; color:var(--muted); margin-bottom:28px; }
+  .price-features { list-style:none; margin-bottom:32px; }
+  .price-features li { display:flex; align-items:center; gap:10px; font-size:0.875rem; color:rgba(255,255,255,0.8); margin-bottom:12px; }
+  .price-features li::before { content:'✓'; color:var(--green); font-weight:700; font-size:0.8rem; flex-shrink:0; }
+
+  /* ─── FAQ ─────────────────────────────────────────────── */
+  #faq { padding:100px 0; }
+  .faq-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:900px; margin:0 auto; }
+  .faq-item { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; cursor:pointer; transition:border-color 0.2s; }
+  .faq-item:hover { border-color:rgba(108,59,255,0.3); }
+  .faq-q { font-family:'Sora',sans-serif; font-size:0.9rem; font-weight:600; margin-bottom:10px; }
+  .faq-a { font-size:0.84rem; color:var(--muted); line-height:1.7; }
+
+  /* ─── FINAL CTA ───────────────────────────────────────── */
+  #cta-final { padding:140px 0; text-align:center; position:relative; overflow:hidden; }
+  .cta-box {
+    position:relative;
+    background:linear-gradient(135deg,rgba(108,59,255,0.18),rgba(168,85,247,0.08));
+    border:1px solid rgba(108,59,255,0.35);
+    border-radius:32px; padding:80px 60px;
+    max-width:760px; margin:0 auto;
+    overflow:hidden;
+  }
+  .cta-box::before {
+    content:'';
+    position:absolute; inset:-1px; border-radius:33px;
+    background:linear-gradient(135deg,rgba(108,59,255,0.5),transparent 50%,rgba(168,85,247,0.3));
+    z-index:-1;
+  }
+  .cta-box h2 { margin-bottom:20px; }
+  .cta-box p { font-size:1.1rem; max-width:480px; margin:0 auto 40px; }
+  .cta-actions { display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .cta-note { margin-top:20px; font-size:0.78rem; color:var(--muted); }
+
+  /* ─── FOOTER ──────────────────────────────────────────── */
+  footer {
+    padding:56px 0 36px;
+    border-top:1px solid var(--border);
+  }
+  .footer-top { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px; }
+  .footer-brand p { font-size:0.83rem; color:var(--muted); margin-top:12px; max-width:220px; }
+  .footer-col h4 { font-family:'Sora',sans-serif; font-size:0.8rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:16px; }
+  .footer-col a { display:block; font-size:0.85rem; color:rgba(255,255,255,0.5); text-decoration:none; margin-bottom:10px; transition:color 0.2s; }
+  .footer-col a:hover { color:var(--white); }
+  .footer-bottom { display:flex; justify-content:space-between; align-items:center; padding-top:28px; border-top:1px solid var(--border); font-size:0.78rem; color:var(--muted); }
+  .footer-bottom-links { display:flex; gap:20px; }
+  .footer-bottom-links a { color:var(--muted); text-decoration:none; }
+  .footer-bottom-links a:hover { color:var(--white); }
+
+  /* ─── ANIMATIONS ──────────────────────────────────────── */
+  .fade-up { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .fade-up.visible { opacity:1; transform:translateY(0); }
+  .fade-up-delay-1 { transition-delay:0.1s; }
+  .fade-up-delay-2 { transition-delay:0.2s; }
+  .fade-up-delay-3 { transition-delay:0.3s; }
+  .fade-up-delay-4 { transition-delay:0.4s; }
+  .fade-up-delay-5 { transition-delay:0.5s; }
+
+  /* ─── RESPONSIVE ──────────────────────────────────────── */
+  @media(max-width:900px){
+    .hero-inner,.problem-inner { grid-template-columns:1fr; }
+    .features-grid,.testimonials-grid { grid-template-columns:1fr 1fr; }
+    .feature-card.featured { grid-row:auto; }
+    .pricing-grid { grid-template-columns:1fr; max-width:420px; }
+    .steps-grid { grid-template-columns:1fr; gap:32px; }
+    .steps-grid::before { display:none; }
+    .metrics-row { grid-template-columns:1fr 1fr; }
+    .footer-top { grid-template-columns:1fr 1fr; }
+    .faq-grid { grid-template-columns:1fr; }
+  }
+  @media(max-width:600px){
+    .features-grid,.testimonials-grid,.metrics-row { grid-template-columns:1fr; }
+    .nav-links { display:none; }
+    .cta-box { padding:48px 24px; }
+    h1 { font-size:2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════ -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">⚡</div>
+        TaskFlow AI
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#proof">Reviews</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="nav-cta">
+        <a href="#" class="btn-ghost">Log In</a>
+        <a href="#" class="btn-primary">Start Free Trial →</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════ -->
+<section id="hero">
+  <!-- Background neural mesh -->
+  <canvas id="neural-canvas"></canvas>
+
+  <!-- Background orbs -->
+  <div class="glow-orb" style="width:600px;height:600px;background:var(--violet);top:-200px;left:-150px;opacity:0.18;"></div>
+  <div class="glow-orb" style="width:400px;height:400px;background:var(--violet-mid);bottom:-100px;right:-100px;opacity:0.15;"></div>
+
+  <div class="container">
+    <div class="hero-inner">
+
+      <!-- LEFT: Copy -->
+      <div class="hero-copy">
+        <div class="pill fade-up"><span class="pill-dot"></span> Now in Public Beta — 14-Day Free Trial</div>
+        <h1 class="fade-up fade-up-delay-1">
+          Your team's next<br/>
+          <span class="gradient-text">unfair advantage</span><br/>
+          is an AI sprint ahead.
+        </h1>
+        <p class="fade-up fade-up-delay-2">
+          TaskFlow AI turns chaotic project threads, missed deadlines, and scattered notes into a self-managing workflow — in under 60 seconds.
+        </p>
+        <div class="hero-actions fade-up fade-up-delay-3">
+          <a href="#" class="btn-primary" style="font-size:1rem;padding:16px 32px;">Start Free Trial — No Card Needed</a>
+          <a href="#how" class="btn-ghost">Watch 90-sec Demo ▶</a>
+        </div>
+        <div class="hero-trust fade-up fade-up-delay-4">
+          <div class="avatars">
+            <div class="avatar" style="background:linear-gradient(135deg,#6C3BFF,#A855F7)">JR</div>
+            <div class="avatar" style="background:linear-gradient(135deg,#2563EB,#7C3AED)">SM</div>
+            <div class="avatar" style="background:linear-gradient(135deg,#DB2777,#9333EA)">AK</div>
+            <div class="avatar" style="background:linear-gradient(135deg,#0891B2,#6C3BFF)">TL</div>
+          </div>
+          <div class="hero-trust-text">
+            <div class="stars">★★★★★</div>
+            <div>Loved by <strong>12,000+</strong> teams in 47 countries</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: App Mockup -->
+      <div class="hero-visual fade-up fade-up-delay-2">
+        <div class="app-mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dot" style="background:#FF5F57;"></div>
+            <div class="mockup-dot" style="background:#FEBC2E;"></div>
+            <div class="mockup-dot" style="background:#28C840;"></div>
+            <span class="mockup-bar-title">Q3 Product Launch — TaskFlow AI</span>
+          </div>
+
+          <div class="task-row">
+            <div class="task-check" style="background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;">✓</div>
+            <div class="task-label" style="text-decoration:line-through;color:var(--muted);">Finalize design system tokens</div>
+            <div class="task-badge" style="background:rgba(34,211,165,0.15);color:var(--green);">Done</div>
+          </div>
+          <div class="task-row" style="border-color:rgba(108,59,255,0.3);background:rgba(108,59,255,0.06);">
+            <div class="task-check" style="background:rgba(108,59,255,0.3);border:1.5px solid var(--violet);"></div>
+            <div class="task-label">Write API documentation v2</div>
+            <div class="task-badge" style="background:rgba(251,191,36,0.15);color:#FBBF24;">In Progress</div>
+          </div>
+          <div class="task-row">
+            <div class="task-check" style="background:rgba(255,255,255,0.06);border:1.5px solid var(--border);"></div>
+            <div class="task-label" style="color:var(--muted);">Set up staging environment</div>
+            <div class="task-badge" style="background:rgba(255,255,255,0.06);color:var(--muted);">Upcoming</div>
+          </div>
+          <div class="task-row">
+            <div class="task-check" style="background:rgba(255,255,255,0.06);border:1.5px solid var(--border);"></div>
+            <div class="task-label" style="color:var(--muted);">Launch email campaign</div>
+            <div class="task-badge" style="background:rgba(255,255,255,0.06);color:var(--muted);">Upcoming</div>
+          </div>
+
+          <div class="ai-insight-card">
+            <div class="ai-icon">✦</div>
+            <div>
+              <div class="ai-label">AI INSIGHT</div>
+              <div class="ai-text">At current velocity, Q3 launch is <strong style="color:var(--lavender);">3 days ahead of schedule</strong>. Consider pulling in the beta feedback cycle — Marcus is unblocked.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating stat chips -->
+        <div class="stat-chip chip-1">
+          <div class="num gradient-text">↑ 3.2×</div>
+          <div class="lbl">Team velocity</div>
+        </div>
+        <div class="stat-chip chip-2">
+          <div class="num" style="color:var(--green);">94%</div>
+          <div class="lbl">On-time delivery</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     LOGOS
+════════════════════════════════════════════════════ -->
+<section id="logos">
+  <div class="container">
+    <div class="logos-label">Trusted by teams at world-class companies</div>
+    <div class="logos-track">
+      <div class="logo-mark">Vercel</div>
+      <div class="logo-mark">Stripe</div>
+      <div class="logo-mark">Notion</div>
+      <div class="logo-mark">Linear</div>
+      <div class="logo-mark">Figma</div>
+      <div class="logo-mark">Supabase</div>
+      <div class="logo-mark">Loom</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     PROBLEM / INSIGHT
+════════════════════════════════════════════════════ -->
+<section id="problem">
+  <div class="glow-orb" style="width:500px;height:500px;background:var(--violet-mid);top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.07;"></div>
+  <div class="container">
+    <div class="problem-inner">
+      <div class="fade-up">
+        <div class="problem-stat gradient-text">68%</div>
+        <div class="problem-stat-label">of knowledge workers say they spend more time managing work than doing it.</div>
+        <div style="margin-top:16px;font-size:0.78rem;color:var(--muted);">— McKinsey Global Institute, 2024</div>
+      </div>
+      <div class="problem-copy fade-up fade-up-delay-1">
+        <div class="pill" style="margin-bottom:20px;">The Real Problem</div>
+        <h2>Your tools are<br/><span class="gradient-text">working against you.</span></h2>
+        <p>You hired smart people. You bought the best tools. But somehow, your team is still buried in status meetings, chasing Slack threads, and updating spreadsheets no one reads.</p>
+        <p>The problem isn't your team. It's the coordination overhead silently eating 3–4 hours every single day.</p>
+        <div class="callout-bar">
+          "The average team loses $47,000 per year per person to preventable coordination friction."
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FEATURES
+════════════════════════════════════════════════════ -->
+<section id="features">
+  <div class="glow-orb" style="width:700px;height:700px;background:var(--violet);top:-100px;right:-200px;opacity:0.1;"></div>
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="pill">What's Inside</div>
+      <h2 style="margin-top:20px;">Built for teams who<br/><span class="gradient-text">actually ship.</span></h2>
+      <p>Every feature is designed around one idea: eliminate the coordination tax so your team can spend 100% of their energy on work that matters.</p>
+    </div>
+
+    <div class="features-grid">
+
+      <!-- FEATURED: AI Copilot -->
+      <div class="feature-card featured fade-up">
+        <div>
+          <span class="feat-icon">✦</span>
+          <h3 class="feat-title">AI Project Copilot</h3>
+          <p class="feat-desc">TaskFlow's AI reads your entire project context — tasks, blockers, team capacity, deadlines — and proactively surfaces what needs your attention before it becomes a fire.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="ai-label" style="color:var(--lavender);font-size:0.7rem;font-weight:600;letter-spacing:0.06em;margin-bottom:12px;">CAPACITY FORECAST — THIS WEEK</div>
+          <div class="progress-row">
+            <div class="progress-label"><span>Sarah M.</span><span style="color:var(--green);">78%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:78%;"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>James R.</span><span style="color:#FBBF24;">95%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:95%;background:linear-gradient(90deg,#FBBF24,#F59E0B);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>Anika K.</span><span style="color:var(--lavender);">52%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:52%;"></div></div>
+          </div>
+          <div style="margin-top:12px;padding:10px 12px;background:rgba(108,59,255,0.12);border-radius:8px;font-size:0.78rem;color:var(--lavender);">
+            ✦ James is at risk — reassign 2 tasks to Anika to keep launch on track.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feature-card fade-up fade-up-delay-1">
+        <span class="feat-icon">⚡</span>
+        <h3 class="feat-title">Instant Task Intelligence</h3>
+        <p class="feat-desc">Drop a messy brief, Slack thread, or email into TaskFlow. The AI extracts action items, assigns owners, and sets realistic deadlines — in seconds.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card fade-up fade-up-delay-2">
+        <span class="feat-icon">📡</span>
+        <h3 class="feat-title">Real-Time Team Radar</h3>
+        <p class="feat-desc">See exactly who's working on what, who's blocked, and where the bottlenecks are — without interrupting anyone for a status update.</p>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="feature-card fade-up fade-up-delay-1">
+        <span class="feat-icon">🔗</span>
+        <h3 class="feat-title">Plug Into Your Stack</h3>
+        <p class="feat-desc">Two-way syncs with Slack, GitHub, Linear, Figma, Notion, and 40+ tools. TaskFlow fits into how you work — not the other way around.</p>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="feature-card fade-up fade-up-delay-2">
+        <span class="feat-icon">📊</span>
+        <h3 class="feat-title">Executive Reporting, Automated</h3>
+        <p class="feat-desc">One-click stakeholder updates. TaskFlow writes the status report. You just hit send — or let it do that too.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════════════ -->
+<section id="how">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="pill">How It Works</div>
+      <h2 style="margin-top:20px;">From chaos to clarity<br/><span class="gradient-text">in three steps.</span></h2>
+      <p>No 6-week onboarding. No migration headaches. Your whole team is running in under an hour.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step fade-up">
+        <div class="step-num">01</div>
+        <h3>Connect Your Tools</h3>
+        <p>Link your existing stack in one click. TaskFlow reads your projects, docs, calendars, and communication channels to build a complete picture of your work.</p>
+      </div>
+      <div class="step fade-up fade-up-delay-1">
+        <div class="step-num">02</div>
+        <h3>AI Maps Your Workflow</h3>
+        <p>Our AI analyzes patterns across your team's work history, capacity, and priorities — then builds an intelligent workspace tailored to how you actually operate.</p>
+      </div>
+      <div class="step fade-up fade-up-delay-2">
+        <div class="step-num">03</div>
+        <h3>Ship Faster, Stress Less</h3>
+        <p>Your team gets a clear, prioritized view of what matters today. The AI handles reminders, reassignments, and blockers so you can focus on the work itself.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SOCIAL PROOF
+════════════════════════════════════════════════════ -->
+<section id="proof">
+  <div class="glow-orb" style="width:600px;height:600px;background:var(--violet);bottom:-200px;left:-100px;opacity:0.1;"></div>
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="pill">Real Results</div>
+      <h2 style="margin-top:20px;">Numbers don't<br/><span class="gradient-text">need a spin doctor.</span></h2>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-row fade-up">
+      <div class="metric-card">
+        <div class="metric-num gradient-text">3.2×</div>
+        <div class="metric-label">Average team velocity increase in first 90 days</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num gradient-text">11 hrs</div>
+        <div class="metric-label">Saved per person per week on coordination overhead</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num gradient-text">94%</div>
+        <div class="metric-label">Of projects delivered on time (up from 61%)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num gradient-text">4 min</div>
+        <div class="metric-label">Average time to get a new team member productive</div>
+      </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="testimonials-grid">
+      <div class="testi-card featured-testi fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"We cut our weekly standups from 5 per week to 1. The AI gives everyone the context they need before they even open Slack. Our eng team basically cried tears of joy."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MR</div>
+          <div>
+            <div class="testi-name">Marcus Reid</div>
+            <div class="testi-role">VP of Engineering, Helix Labs</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up fade-up-delay-1">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"I've tried Asana, Monday, Jira, Linear. Nothing comes close to what TaskFlow does with AI. It feels like the first tool that actually thinks about my team."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#DB2777,#9333EA);">SP</div>
+          <div>
+            <div class="testi-name">Sophia Park</div>
+            <div class="testi-role">Head of Product, Arco Systems</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up fade-up-delay-2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"We went from shipping once a month to shipping every two weeks. Same team. Same resources. TaskFlow just removed all the invisible friction we didn't even know was there."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#0891B2,#6C3BFF);">DJ</div>
+          <div>
+            <div class="testi-name">Dev Joshi</div>
+            <div class="testi-role">CTO, Prism Analytics</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     PRICING
+════════════════════════════════════════════════════ -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="pill">Pricing</div>
+      <h2 style="margin-top:20px;">One plan for every<br/><span class="gradient-text">stage of growth.</span></h2>
+      <p>No hidden fees. No seat-count shock. Cancel anytime in two clicks.</p>
+    </div>
+
+    <div class="pricing-toggle fade-up">
+      <span style="color:var(--muted);">Monthly</span>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span>Annual</span>
+      <span class="save-badge">Save 30%</span>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="price-card fade-up">
+        <div class="price-tier">Starter</div>
+        <div class="price-amount"><span>$</span>0</div>
+        <div class="price-period">forever — no card required</div>
+        <div class="price-desc">Perfect for solopreneurs and small teams getting started.</div>
+        <ul class="price-features">
+          <li>Up to 3 team members</li>
+          <li>5 active projects</li>
+          <li>Basic AI task parsing</li>
+          <li>Slack integration</li>
+          <li>7-day activity history</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="width:100%;justify-content:center;">Get Started Free</a>
+      </div>
+
+      <!-- Pro (Popular) -->
+      <div class="price-card popular fade-up fade-up-delay-1">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="price-tier" style="color:var(--lavender);margin-top:12px;">Pro</div>
+        <div class="price-amount"><span>$</span>29</div>
+        <div class="price-period">per seat / month, billed annually</div>
+        <div class="price-desc">For teams who are serious about shipping faster.</div>
+        <ul class="price-features">
+          <li>Unlimited team members</li>
+          <li>Unlimited projects</li>
+          <li>Full AI Copilot suite</li>
+          <li>40+ integrations</li>
+          <li>Capacity forecasting</li>
+          <li>Automated status reports</li>
+          <li>Priority support (4hr SLA)</li>
+        </ul>
+        <a href="#" class="btn-primary" style="width:100%;justify-content:center;">Start 14-Day Free Trial →</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="price-card fade-up fade-up-delay-2">
+        <div class="price-tier">Enterprise</div>
+        <div class="price-amount" style="font-size:2rem;">Custom</div>
+        <div class="price-period">tailored to your organization</div>
+        <div class="price-desc">For companies who need security, compliance, and scale.</div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>SSO & SAML 2.0</li>
+          <li>SOC 2 Type II compliance</li>
+          <li>Custom AI model fine-tuning</li>
+          <li>Dedicated success manager</li>
+          <li>99.99% SLA guarantee</li>
+        </ul>
+        <a href="#" class="btn-ghost" style="width:100%;justify-content:center;">Talk to Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════════════ -->
+<section id="faq">
+  <div class="container">
+    <div class="section-header fade-up" style="margin-bottom:48px;">
+      <h2>Questions we<br/><span class="gradient-text">get a lot.</span></h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item fade-up">
+        <div class="faq-q">How is TaskFlow different from Asana or Monday?</div>
+        <div class="faq-a">Those tools track work. TaskFlow thinks about it. The AI doesn't just show you tasks — it analyzes your team's patterns, predicts blockers, and tells you what to do next. It's the difference between a whiteboard and a chief of staff.</div>
+      </div>
+      <div class="faq-item fade-up fade-up-delay-1">
+        <div class="faq-q">How long does onboarding take?</div>
+        <div class="faq-a">Most teams are fully onboarded in under an hour. Connect your integrations, invite your team, and the AI does the rest — it learns your workflow automatically from your existing data.</div>
+      </div>
+      <div class="faq-item fade-up fade-up-delay-1">
+        <div class="faq-q">Is my data secure?</div>
+        <div class="faq-a">Absolutely. TaskFlow is SOC 2 Type II certified, uses end-to-end encryption at rest and in transit, and we never train our models on your private data. Your IP stays yours.</div>
+      </div>
+      <div class="faq-item fade-up fade-up-delay-2">
+        <div class="faq-q">Can I cancel anytime?</div>
+        <div class="faq-a">Yes, no questions asked. Cancel in two clicks from your settings page. You keep access until the end of your billing period, and we'll export all your data in a clean format.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════════════════ -->
+<section id="cta-final">
+  <div class="glow-orb" style="width:800px;height:800px;background:var(--violet);top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.12;"></div>
+  <div class="container">
+    <div class="cta-box fade-up">
+      <!-- Shimmer top line -->
+      <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.8),transparent);"></div>
+      <div class="pill" style="margin-bottom:28px;">14-Day Free Trial · No Credit Card</div>
+      <h2>
+        The best time to<br/>
+        <span class="gradient-text">eliminate your coordination tax</span><br/>
+        was last quarter.
+      </h2>
+      <p>The second best time is right now. Your trial is free, setup takes 4 minutes, and the results speak for themselves in week one.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn-primary" style="font-size:1rem;padding:18px 36px;">Start Free Trial — It's Free →</a>
+        <a href="#" class="btn-ghost">Schedule a Demo</a>
+      </div>
+      <div class="cta-note">✓ No credit card &nbsp;·&nbsp; ✓ Cancel anytime &nbsp;·&nbsp; ✓ Full feature access for 14 days</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="logo" style="text-decoration:none;display:flex;align-items:center;gap:8px;">
+          <div class="logo-icon">⚡</div>
+          TaskFlow AI
+        </a>
+        <p>AI-powered project management for teams who are done managing work and ready to do it.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#">Features</a>
+        <a href="#">Integrations</a>
+        <a href="#">Pricing</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 TaskFlow AI, Inc. All rights reserved.</div>
+      <div class="footer-bottom-links">
+        <a href="#">Twitter</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════ -->
+<script>
+// ── Neural Mesh Animation ───────────────────────────
+const canvas = document.getElementById('neural-canvas');
+const ctx = canvas.getContext('2d');
+let nodes = [], W, H, animId;
+
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = document.getElementById('hero').offsetHeight;
+}
+
+function initNodes(count = 55) {
+  nodes = Array.from({length: count}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 2.5 + 1,
+    pulse: Math.random() * Math.PI * 2
+  }));
+}
+
+function draw(t) {
+  ctx.clearRect(0, 0, W, H);
+  const DIST = 160;
+
+  nodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    n.pulse += 0.018;
+    if(n.x < 0||n.x > W) n.vx *= -1;
+    if(n.y < 0||n.y > H) n.vy *= -1;
+
+    // node glow
+    const alpha = 0.25 + 0.15 * Math.sin(n.pulse);
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(168,85,247,${alpha})`;
+    ctx.fill();
+  });
+
+  // edges
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx*dx + dy*dy);
+      if(d < DIST){
+        const a = (1 - d/DIST) * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(108,59,255,${a})`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+    }
+  }
+  animId = requestAnimationFrame(draw);
+}
+
+resize(); initNodes(); draw(0);
+window.addEventListener('resize', () => { resize(); initNodes(); });
+
+// ── Scroll Fade-Up ──────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ── Sticky Nav shadow on scroll ─────────────────────
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  nav.style.background = window.scrollY > 20
+    ? 'rgba(9,9,11,0.95)'
+    : 'rgba(9,9,11,0.7)';
+});
+
+// ── Pricing Toggle ──────────────────────────────────
+const toggle = document.querySelector('.toggle-track');
+const thumb  = document.querySelector('.toggle-thumb');
+let annual = true;
+const prices = { starter:'0', pro:'29', ent:'Custom' };
+const pricesMonthly = { starter:'0', pro:'39', ent:'Custom' };
+toggle.addEventListener('click', () => {
+  annual = !annual;
+  thumb.style.right = annual ? '3px' : 'auto';
+  thumb.style.left  = annual ? 'auto' : '3px';
+  const amounts = document.querySelectorAll('.price-amount');
+  amounts[0].innerHTML = `<span>$</span>${annual?prices.starter:pricesMonthly.starter}`;
+  amounts[1].innerHTML = `<span>$</span>${annual?prices.pro:pricesMonthly.pro}`;
+  amounts[2].innerHTML = annual?'Custom':'Custom';
+});
+</script>
+</body>
+</html>
